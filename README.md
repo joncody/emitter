@@ -12,13 +12,7 @@ The `emitter` function implements an event emitter that can be used for managing
 
 ## Installation
 
-If you are using npm, you can install it like this:
-
-```bash
-npm install emitter
-```
-
-Then import it into your JavaScript:
+Import it into your JavaScript:
 
 ```javascript
 import emitter from 'emitter';
