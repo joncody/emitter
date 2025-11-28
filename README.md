@@ -15,7 +15,7 @@ The `emitter` function implements an event emitter that can be used for managing
 Import it into your JavaScript:
 
 ```javascript
-import emitter from 'emitter';
+import emitter from './emitter.js';
 ```
 
 ## Example Usage
@@ -25,7 +25,7 @@ Here’s an example of how to use the `emitter` function to manage events:
 ### Create an emitter and add event listeners:
 
 ```javascript
-import emitter from 'emitter';
+import emitter from './emitter.js';
 
 const em = emitter();
 
