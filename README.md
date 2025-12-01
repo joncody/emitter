@@ -1,163 +1,122 @@
-# Emitter - EventEmitter Implementation
+# `emitter.js` – Lightweight Event Emitter
 
-The `emitter` function implements an event emitter that can be used for managing event listeners and emitting events. It provides functionality similar to Node.js EventEmitter, allowing you to add, remove, and emit events.
+A tiny, robust implementation of the Observer pattern.
 
-## Features
+**emitter.js** provides a simple interface for subscribing to and emitting events. It works as a standalone event bus or as a **mixin** to add event capabilities to any existing object.
 
-- **Add and remove event listeners** for different event types.
-- **Emit events** to notify all listeners of a specific type.
-- Support for **one-time event listeners** (`once` method).
-- Allows **removal of specific listeners** or **all listeners** for a particular event type.
-- Supports **newListener** and **removeListener** events for monitoring listener changes.
+---
 
-## Installation
+## ✅ Features
 
-Import it into your JavaScript:
+- 👂 **Standard API:** Familiar Node.js-style methods (`on`, `off`, `emit`, `once`)
+- 🧬 **Mixin Support:** Can augment existing objects with event capabilities
+- ⚡ **Meta Events:** Supports `newListener` and `removeListener` events for internal tracking
+- 🔄 **Chainable:** Subscription methods return the instance for method chaining
+- 📦 **Zero dependencies**, modern ES module
 
-```javascript
+---
+
+## 📦 Installation
+
+Copy `emitter.js` into your project.
+
+Import as a module:
+
+```js
 import emitter from './emitter.js';
 ```
 
-## Example Usage
+---
 
-Here’s an example of how to use the `emitter` function to manage events:
+## 🧠 Quick Examples
 
-### Create an emitter and add event listeners:
+### Standalone Usage
 
-```javascript
-import emitter from './emitter.js';
+```js
+import emitter from "./emitter.js";
 
-const em = emitter();
+const bus = emitter();
 
-// Event listener function
-function onMessageReceived(msg) {
-    console.log('Message received:', msg);
-}
-
-// Add a listener for the 'message' event
-em.on('message', onMessageReceived);
-
-// Emit the 'message' event with a message as argument
-em.emit('message', 'Hello, world!'); // Output: Message received: Hello, world!
-```
-
-### Add a one-time listener (`once`):
-
-```javascript
-// Add a one-time listener for 'onceMessage' event
-em.once('onceMessage', (msg) => {
-    console.log('One-time message:', msg);
+bus.on("greet", (name) => {
+    console.log(`Hello, ${name}!`);
 });
 
-// Emit 'onceMessage' event
-em.emit('onceMessage', 'This will be logged once'); // Output: One-time message: This will be logged once
-
-// Emitting again won't trigger the listener
-em.emit('onceMessage', 'This will not be logged');
+bus.emit("greet", "World"); // "Hello, World!"
 ```
 
-### Remove a specific listener:
+### Mixin Usage (Adding events to objects)
 
-```javascript
-// Remove the 'onMessageReceived' listener from 'message' event
-em.removeListener('message', onMessageReceived);
+```js
+const user = { name: "Alice" };
 
-// Emit the 'message' event after removing the listener
-em.emit('message', 'This will not be logged'); // No output
+// Upgrade 'user' to be an Emitter
+emitter(user);
+
+user.on("login", () => {
+    console.log(`${user.name} has logged in.`);
+});
+
+user.emit("login"); // "Alice has logged in."
 ```
 
-### Remove all listeners for a specific event:
+---
 
-```javascript
-// Remove all listeners for the 'message' event
-em.removeAllListeners('message');
+## 📚 API Reference
 
-// Emit the 'message' event after removing all listeners
-em.emit('message', 'No listeners left'); // No output
-```
+### 🟢 Initialization
 
-## API Documentation
+| Function | Description |
+|----------|-------------|
+| `emitter([target])` | Creates a new emitter, or adds emitter methods to the `target` object if provided. |
 
-### `em.addListener(type, listener)`
-Adds a listener to a specific event type.
-
-#### Parameters:
-- **`type`** (string): The event type (e.g., `'message'`).
-- **`listener`** (function): The listener function to be added.
-
-#### Returns:
-- The emitter instance (`em`).
+**Properties:**
+*   `em.emitter` – Boolean `true`.
+*   `em.events` – Object containing the active listeners.
 
 ---
 
-### `em.on(type, listener)`
-Alias for `addListener`.
+### 👂 Subscription
+
+| Function | Description |
+|----------|-------------|
+| `on(type, listener)` | Adds a listener to the end of the listeners array for the specified event. |
+| `addListener(type, listener)` | Alias for `on`. |
+| `once(type, listener)` | Adds a **one-time** listener. The listener is invoked only the next time the event is fired, then removed. |
+
+*Note: These methods return the emitter instance for chaining.*
 
 ---
 
-### `em.once(type, listener)`
-Adds a one-time listener to a specific event type. The listener is invoked at most once.
+### 🛑 Management
 
-#### Parameters:
-- **`type`** (string): The event type.
-- **`listener`** (function): The listener function to be added.
-
-#### Returns:
-- The emitter instance (`em`).
+| Function | Description |
+|----------|-------------|
+| `off(type, listener)` | Removes the specified listener from the listener array for the specified event. |
+| `removeListener(type, listener)` | Alias for `off`. |
+| `removeAllListeners([type])` | Removes all listeners, or those of the specified `type`. |
 
 ---
 
-### `em.removeListener(type, listener)`
-Removes a specific listener for a given event type.
+### ⚡ Execution & Introspection
 
-#### Parameters:
-- **`type`** (string): The event type.
-- **`listener`** (function): The listener function to be removed.
-
-#### Returns:
-- The emitter instance (`em`).
+| Function | Description |
+|----------|-------------|
+| `emit(type, [...args])` | Synchronously calls each of the listeners registered for the event, passing the supplied arguments. Returns `true` if the event had listeners, `false` otherwise. |
+| `listeners([type])` | Returns an array of listeners.<br>• If `type` is provided: returns the array of listeners for that specific event.<br>• If `type` is omitted: returns an array containing **all** listener arrays for every event. |
 
 ---
 
-### `em.off(type, listener)`
-Alias for `removeListener`.
+## 🔄 Meta Events
+
+The emitter instance itself emits events during its own lifecycle:
+
+*   **`newListener`**: Emitted *before* a listener is added.
+    *   *Args:* `(event, listener)`
+*   **`removeListener`**: Emitted *after* a listener is removed.
+    *   *Args:* `(event, listener)`
 
 ---
 
-### `em.removeAllListeners([type])`
-Removes all listeners for a specific event type or all events if no type is provided.
-
-#### Parameters:
-- **`type`** (string, optional): The event type. If omitted, all event listeners are removed.
-
-#### Returns:
-- The emitter instance (`em`).
-
----
-
-### `em.listeners(type)`
-Returns an array of listeners for a specific event type.
-
-#### Parameters:
-- **`type`** (string): The event type.
-
-#### Returns:
-- An array of listener functions.
-
----
-
-### `em.emit(type, [...args])`
-Emits an event of the specified type, calling all registered listeners with the provided arguments.
-
-#### Parameters:
-- **`type`** (string): The event type.
-- **`args`** (array): Arguments to pass to the listener functions.
-
-#### Returns:
-- `true` if the event was emitted (i.e., at least one listener was called), otherwise `false`.
-
----
-
-## License
+## 📄 License
 
 See the [LICENSE](./LICENSE) file for details.
