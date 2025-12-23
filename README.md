@@ -71,9 +71,6 @@ user.emit("login"); // "Alice has logged in."
 |----------|-------------|
 | `emitter([target])` | Creates a new emitter, or adds emitter methods to the `target` object if provided. Returns the (augmented) object. |
 
-**Properties:**
-- `em.events` – Object storing event listeners by type.
-
 ---
 
 ### 👂 Subscription
