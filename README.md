@@ -14,16 +14,16 @@ A tiny, robust implementation of the Observer pattern.
 - 🧬 **Mixin Support**: Augment existing objects with event capabilities
 - ⚡ **Meta Events**: Supports `newListener` and `removeListener` for introspection
 - 🔄 **Chainable**: Subscription methods return the instance for fluent syntax
-- 📦 **Tiny**: Under 1KB minified, fully tree-shakable
+- 🛡️ **Prototype Safe**: Encapsulated event map built with `Object.create(null)`
 
 ---
 
 ## 📦 Installation
 
-Copy `emitter.js` into your project and import it as an ES module:
+Copy `src/emitter.js` into your project and import it as an ES module:
 
 ```js
-import emitter from './emitter.js';
+import emitter from './src/emitter.js';
 ```
 
 ---
@@ -33,12 +33,12 @@ import emitter from './emitter.js';
 ### Standalone Usage
 
 ```js
-import emitter from "./emitter.js";
+import emitter from "./src/emitter.js";
 
 const bus = emitter();
 
-bus.on("greet", (name) => {
-    console.log(`Hello, ${name}!`);
+bus.on("greet", function (name) {
+    console.log("Hello, " + name + "!");
 });
 
 bus.emit("greet", "World"); // "Hello, World!"
@@ -47,19 +47,19 @@ bus.emit("greet", "World"); // "Hello, World!"
 ### Mixin Usage (Adding events to objects)
 
 ```js
+import emitter from "./src/emitter.js";
+
 const user = { name: "Alice" };
 
 // Upgrade 'user' to be an event emitter
-emitter(user);
+const app_user = emitter(user);
 
-user.on("login", () => {
-    console.log(`${user.name} has logged in.`);
+app_user.on("login", function () {
+    console.log(app_user.name + " has logged in.");
 });
 
-user.emit("login"); // "Alice has logged in."
+app_user.emit("login"); // "Alice has logged in."
 ```
-
-> ⚠️ **Note**: The target object must be **mutable and extensible**. Frozen, sealed, or non-writable objects will cause an error.
 
 ---
 
@@ -69,7 +69,7 @@ user.emit("login"); // "Alice has logged in."
 
 | Function | Description |
 |----------|-------------|
-| `emitter([target])` | Creates a new emitter, or adds emitter methods to the `target` object if provided. Returns the (augmented) object. |
+| `emitter([target])` | Creates a new emitter, or adds emitter methods to the `target` object if provided. Returns the frozen instance. |
 
 ---
 
@@ -77,9 +77,9 @@ user.emit("login"); // "Alice has logged in."
 
 | Function | Description |
 |----------|-------------|
-| `on(type, listener)` | Adds a listener to the end of the listeners array for the event `type`. |
+| `on(type, listener)` | Adds a listener to the end of the listeners array for `type`. |
 | `addListener(type, listener)` | Alias for `on`. |
-| `once(type, listener)` | Adds a **one-time** listener. The listener is removed after its first invocation. |
+| `once(type, listener)` | Adds a **one-time** listener. Removed after its first invocation. |
 
 > ✅ All subscription methods return the emitter instance for chaining.
 
@@ -89,9 +89,9 @@ user.emit("login"); // "Alice has logged in."
 
 | Function | Description |
 |----------|-------------|
-| `off(type, listener)` | Removes the specified listener from the event `type`. |
+| `off(type, listener)` | Removes the specified listener from `type`. |
 | `removeListener(type, listener)` | Alias for `off`. |
-| `removeAllListeners([type])` | Removes all listeners, or those of the specified `type` if provided. |
+| `removeAllListeners([type])` | Removes all listeners, or those of `type` if provided. |
 
 ---
 
@@ -99,24 +99,23 @@ user.emit("login"); // "Alice has logged in."
 
 | Function | Description |
 |----------|-------------|
-| `emit(type, [...args])` | Synchronously calls each listener for `type`, passing the supplied arguments. Returns `true` if listeners existed, `false` otherwise. |
+| `emit(type, [...args])` | Synchronously calls each listener for `type`. Returns `true` if listeners existed, `false` otherwise. |
 | `listeners([type])` | Returns an array of listeners.<br>• With `type`: returns listeners for that event.<br>• Without `type`: returns a flat array of **all** registered listeners. |
 
 ---
 
-## 🔄 Meta Events
+## 🧪 Testing
 
-The emitter can notify you about changes to its own listener registry:
+This library includes a zero-dependency, comprehensive browser-based verification suite covering 100% of methods, meta-events, and prototype boundary guards.
 
-- **`newListener`**: Emitted **before** a new listener is added.  
-  _Arguments_: `(eventType, listenerFunction)`
-- **`removeListener`**: Emitted **after** a listener is removed.  
-  _Arguments_: `(eventType, listenerFunction)`
+To run the test suite:
 
-> 💡 **Important**: Meta events are **only triggered if a listener for that meta event is already registered**. For example, a `newListener` handler will **not** be notified about its own registration—it only sees future additions.
+1. Serve the repository using any static web server (e.g., Nginx, Caddy, or Python's `http.server`).
+2. Open `tests/index.html` in your browser (e.g., `http://localhost/tests/index.html`).
+3. View results visually on the page or open Developer Tools (`F12` -> **Console**) to inspect grouped log outputs and execution metrics.
 
 ---
 
 ## 📄 License
 
-See [LICENSE](./LICENSE)
+See [LICENSE](./LICENSE) for details.
