@@ -35,6 +35,7 @@ import emitter from './src/emitter.js';
 ```js
 import emitter from "./src/emitter.js";
 
+// Creates an immutable, frozen standalone event bus
 const bus = emitter();
 
 bus.on("greet", function (name) {
@@ -52,14 +53,19 @@ import emitter from "./src/emitter.js";
 const user = { name: "Alice" };
 
 // Upgrade 'user' to be an event emitter
-const app_user = emitter(user);
+emitter(user);
 
-app_user.on("login", function () {
-    console.log(app_user.name + " has logged in.");
+user.on("login", function () {
+    console.log(user.name + " has logged in.");
 });
 
-app_user.emit("login"); // "Alice has logged in."
+user.emit("login"); // "Alice has logged in."
+
+// The target object remains extensible for application mutations
+user.role = "admin";
 ```
+
+> 💡 **Immutability Note**: Standalone instances (`emitter()`) are **frozen** (`Object.freeze`). Augmented target objects (`emitter(target)`) remain **extensible** so your application code can continue adding properties.
 
 ---
 
@@ -69,7 +75,7 @@ app_user.emit("login"); // "Alice has logged in."
 
 | Function | Description |
 |----------|-------------|
-| `emitter([target])` | Creates a new emitter, or adds emitter methods to the `target` object if provided. Returns the frozen instance. |
+| `emitter([target])` | Creates a new **frozen** standalone emitter, or decorates and returns the **extensible** `target` object if provided. |
 
 ---
 

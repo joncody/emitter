@@ -161,11 +161,10 @@ function create_emitter(target) {
     };
 
     if (typeof target === "object" && target !== null) {
-        self = Object.freeze(Object.assign({}, target, methods));
+        self = Object.assign({}, target, methods);
     } else {
         self = Object.freeze(methods);
     }
-
     return self;
 }
 

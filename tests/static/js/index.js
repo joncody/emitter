@@ -160,9 +160,11 @@ function run_all_tests() {
         typeof mixed.on === "function",
         "Mixin attaches emitter methods"
     );
+    // Verify target extensibility
+    mixed.role = "admin";
     runner.assert(
-        Object.isFrozen(mixed) === true,
-        "Returned mixin object is frozen"
+        mixed.role === "admin",
+        "Extended target remains extensible for application property additions"
     );
 
     // -------------------------------------------------------------------------
