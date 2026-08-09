@@ -2,16 +2,17 @@
 
 A tiny, robust implementation of the Observer pattern.
 
-**`emitter.js`** provides a simple interface for subscribing to and emitting events. It works as a standalone event bus or as a **mixin** to add event capabilities to any existing extensible object.
+**`emitter.js`** provides a simple interface for subscribing to and emitting events. It works as a standalone event bus or as a decorator/mixin factory to add event capabilities to target objects.
 
-> 📦 **Zero dependencies** • ⚡ **Chainable API** • 🌲 **Modern ES module**
+> 📦 **Zero dependencies** • ⚡ **Chainable API** • 🛡️ **Always Frozen** • 🌲 **Modern ES module**
 
 ---
 
 ## ✅ Features
 
 - 👂 **Standard API**: Familiar Node.js-style methods (`on`, `off`, `emit`, `once`)
-- 🧬 **Mixin Support**: Augment existing objects with event capabilities
+- 🧬 **Decorator Support**: Augment target objects with event capabilities in a new frozen instance
+- 🔒 **Strict Immutability**: All returned instances are strictly frozen (`Object.freeze`)
 - ⚡ **Meta Events**: Supports `newListener` and `removeListener` for introspection
 - 🔄 **Chainable**: Subscription methods return the instance for fluent syntax
 - 🛡️ **Prototype Safe**: Encapsulated event map built with `Object.create(null)`
@@ -23,7 +24,7 @@ A tiny, robust implementation of the Observer pattern.
 Copy `src/emitter.js` into your project and import it as an ES module:
 
 ```js
-import emitter from './src/emitter.js';
+import emitter from "./src/emitter.js";
 ```
 
 ---
@@ -45,27 +46,24 @@ bus.on("greet", function (name) {
 bus.emit("greet", "World"); // "Hello, World!"
 ```
 
-### Mixin Usage (Adding events to objects)
+### Decorator Usage (Decorating target objects)
 
 ```js
 import emitter from "./src/emitter.js";
 
 const user = { name: "Alice" };
 
-// Upgrade 'user' to be an event emitter
-emitter(user);
+// Decorate 'user' properties with emitter capabilities into a new frozen object
+const userEmitter = emitter(user);
 
-user.on("login", function () {
-    console.log(user.name + " has logged in.");
+userEmitter.on("login", function () {
+    console.log(userEmitter.name + " has logged in.");
 });
 
-user.emit("login"); // "Alice has logged in."
-
-// The target object remains extensible for application mutations
-user.role = "admin";
+userEmitter.emit("login"); // "Alice has logged in."
 ```
 
-> 💡 **Immutability Note**: Standalone instances (`emitter()`) are **frozen** (`Object.freeze`). Augmented target objects (`emitter(target)`) remain **extensible** so your application code can continue adding properties.
+> 💡 **Immutability Note**: **All** objects returned by `emitter()` or `emitter(target)` are **always frozen** (`Object.freeze`). This guarantees that event emitter instances remain tamper-proof and robust against unexpected runtime mutations.
 
 ---
 
@@ -75,7 +73,7 @@ user.role = "admin";
 
 | Function | Description |
 |----------|-------------|
-| `emitter([target])` | Creates a new **frozen** standalone emitter, or decorates and returns the **extensible** `target` object if provided. |
+| `emitter([target])` | Returns a new **frozen** standalone emitter, or a new **frozen** composite object incorporating properties from `target` if provided. |
 
 ---
 
