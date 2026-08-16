@@ -1,5 +1,11 @@
 # `emitter.js` – Lightweight Event Emitter
 
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=flat&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Module: ESM](https://img.shields.io/badge/Module-ESM-blue.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules)
+[![Dependencies: Zero](https://img.shields.io/badge/Dependencies-0-brightgreen.svg)]()
+[![Design Pattern: Observer](https://img.shields.io/badge/Design%20Pattern-Observer-orange.svg)]()
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 A tiny, robust implementation of the Observer pattern.
 
 **`emitter.js`** provides a simple interface for subscribing to and emitting events. It works as a standalone event bus or as a decorator/mixin factory to add event capabilities to target objects.
